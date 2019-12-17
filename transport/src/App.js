@@ -5,50 +5,69 @@ import './App.css';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 
-import { fetchTransport } from './transport/actions';
+import { fetchTransport, updateColor, updateBrand, updateType } from './transport/actions';
+
+const getFilteredList = (list, type, color, brand) => [...list]
+  .filter((vehicle) => !type || type === vehicle.type)
+  .filter((vehicle) => !color || !!vehicle.colors && vehicle.colors.indexOf(color) !== -1)
+  .filter((vehicle) => !brand || brand === vehicle.brand);
+
 
 class App extends Component {
+  onColorChanged({ target: { value: color } }) {
+    this.props.updateColor({ color });
+  }
+  onBrandChanged({ target: { value: brand } }) {
+    this.props.updateBrand({ brand });
+  }
+  onTypeChanged({ target: { value: type } }) {
+    this.props.updateType({ type });
+  }
+  get filtered() {
+    const { transport, type, color, brand } = this.transportState;
+    return getFilteredList(transport, type, color, brand);
+  }
+  get transportState() {
+    return this.props.transport;
+  }
   render() {
     const {
       fetchTransport,
+    } = this.props;
+    const {
       isLoading,
       error,
-      transport,
-    } = this.props;
-
-    const removeDupes = (val, idx, arr) => arr.indexOf(val) === idx;
-
-    const availableTransport = [...transport]
-      .filter((vehicle) => vehicle.type === 'car')
-      .filter((vehicle) => vehicle.colors.indexOf('red') !== -1);
-      
-
-    // Move to store
-    const colors = availableTransport
-      .map((vehicle) => vehicle.colors)
-      .reduce((a, b) => a.concat(b), [])
-      .filter(removeDupes);
-    
-    // Move to store
-    const brands = availableTransport
-      .map((vehicle) => vehicle.brand)
-      .filter(removeDupes);
-
-    const types = availableTransport
-      .map((vehicle) => vehicle.type)
-      .filter(removeDupes);
+      colors,
+      brands,
+      types,
+      color,
+      brand,
+      type,
+    } = this.transportState;
 
     return (
       <div className="App">
         <button onClick={fetchTransport}>Fetch whiskies</button>
         {isLoading && <h1>Fetching data</h1>}
-        { transport.map(transport => <div>{transport.brand}</div>)}
-        <br />
-        { colors.map(color => <div>{color}</div>)}
-        <br />
-        { brands.map(brand => <div>{brand}</div>)}
-        <br />
-        { types.map(type => <div>{type}</div>)}
+
+        <select value={color} onChange={this.onColorChanged.bind(this)}>
+          <option value="">Select</option>
+          {colors.map((option, idx) => <option key={idx}>{option}</option>)}
+        </select>
+
+        <select value={brand} onChange={this.onBrandChanged.bind(this)}>
+          <option value="">Select</option>
+          {brands.map((option, idx) => <option key={idx}>{option}</option>)}
+        </select>
+
+        <select value={type} onChange={this.onTypeChanged.bind(this)}>
+          <option value="">Select</option>
+          {types.map((option, idx) => <option key={idx}>{option}</option>)}
+        </select>
+
+        <ul>
+          <li>{ this.filtered.map((transport) => <div key={transport.id}>{transport.description}</div>)}</li>
+        </ul>
         {error && <h1>{error}</h1>}
       </div>
     );
@@ -60,6 +79,9 @@ const mapStateToProps = state => ({ ...state });
 const mapDispatchToProps = dispatch =>
     bindActionCreators({
         fetchTransport,
+        updateColor,
+        updateBrand,
+        updateType,
     }, dispatch);
 
 export default connect(mapStateToProps, mapDispatchToProps)(App);
