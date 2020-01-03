@@ -9,26 +9,12 @@ import {
 
 import {updateBrand, updateColor, updateType} from "../../actions";
 import TransportSelect from "../select";
-
+import Grid from "@material-ui/core/Grid/Grid";
 
 const useStyles = makeStyles((theme) => ({
     card: {
         minWidth: 275,
-    },
-    formControl: {
         margin: theme.spacing(1),
-        minWidth: 120,
-    },
-    bullet: {
-        display: 'inline-block',
-        margin: '0 2px',
-        transform: 'scale(0.8)',
-    },
-    title: {
-        fontSize: 14,
-    },
-    pos: {
-        marginBottom: 12,
     },
 }));
 export default function TransportSelector() {
@@ -55,12 +41,20 @@ export default function TransportSelector() {
                     Filter your transportation:
                 </Typography>
 
-                <TransportSelect value={color} list={colors} label={"Color"}
-                                 onChange={onColorChange} disabled={isLoading}/>
-                <TransportSelect value={brand} list={brands} label={"Brand"}
-                                 onChange={onBrandChange} disabled={isLoading}/>
-                <TransportSelect value={type} list={types} label={"Type"}
-                                 onChange={onTypeChange} disabled={isLoading}/>
+                <Grid container spacing={2}>
+                    <Grid item xs={12} sm={6} md={4} lg={3}>
+                        <TransportSelect value={color} list={colors} label={"Color"}
+                                         onChange={onColorChange} disabled={isLoading}/>
+                    </Grid>
+                    <Grid item xs={12} sm={6} md={4} lg={3}>
+                        <TransportSelect value={brand} list={brands} label={"Brand"}
+                                         onChange={onBrandChange} disabled={isLoading}/>
+                    </Grid>
+                    <Grid item xs={12} sm={6} md={4} lg={3}>
+                        <TransportSelect value={type} list={types} label={"Type"}
+                                         onChange={onTypeChange} disabled={isLoading}/>
+                    </Grid>
+                </Grid>
             </CardContent>
         </Card>
     );
